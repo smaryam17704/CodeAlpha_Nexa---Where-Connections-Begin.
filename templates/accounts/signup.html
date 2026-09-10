@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Nexa — Sign Up{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/components.css' %}">{% endblock %}
+{% block body %}
+<div class="auth-page">
+  <div class="card auth-card">
+    <a href="{% url 'core:landing' %}" class="brand-mark">
+      <img src="{% static 'img/nexa-logo.png' %}" alt="Nexa logo">
+    </a>
+    <h1 class="text-page-title auth-title">Create your account</h1>
+    <p class="auth-subtitle">Join Nexa and start connecting beyond.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+        {% include "partials/form_field.html" with field=field %}
+      {% endfor %}
+      {% if form.non_field_errors %}
+        <div class="field-error" style="margin-bottom:16px;">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+    </form>
+    <div class="auth-footer-link">Already have an account? <a href="{% url 'accounts:login' %}">Log in</a></div>
+  </div>
+</div>
+{% endblock %}

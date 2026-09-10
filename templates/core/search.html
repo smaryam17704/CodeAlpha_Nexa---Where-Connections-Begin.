@@ -1,0 +1,83 @@
+{% extends "app_base.html" %}
+{% block title %}Nexa — Search{% endblock %}
+{% block shell_content %}
+<header class="page-header">
+  <form method="get" class="flex gap-2">
+    <input type="search" name="q" value="{{ query }}" class="input" placeholder="Search people, posts, hashtags..." autofocus>
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+</header>
+<div class="page-content" style="max-width: 700px;">
+  {% if not query %}
+    <div class="state-block">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <p class="state-title">Search Nexa</p>
+      <p class="text-meta">Find people, posts, and hashtags.</p>
+    </div>
+  {% elif not people_page.object_list and not posts_page.object_list and not hashtags_page.object_list %}
+    <div class="state-block">
+      <p class="state-title">No results found.</p>
+      <p class="text-meta">Try a different search term.</p>
+    </div>
+  {% else %}
+    {% if people_page.object_list %}
+      <section style="margin-bottom: var(--space-5);">
+        <h2 class="text-section-title" style="margin-bottom: var(--space-2);">People</h2>
+        {% for person in people_page %}
+          <div class="user-row">
+            <a href="{% url 'accounts:profile' username=person.username %}" class="avatar">
+              {% if person.profile.avatar %}<img src="{{ person.profile.avatar.url }}" alt="">{% else %}{{ person.username|slice:":1"|upper }}{% endif %}
+            </a>
+            <a href="{% url 'accounts:profile' username=person.username %}" class="user-row-meta">
+              <div class="name truncate">{{ person.profile.get_display_name }}</div>
+              <div class="handle truncate">@{{ person.username }}</div>
+            </a>
+          </div>
+        {% endfor %}
+        {% if people_page.has_other_pages %}
+          <div class="flex justify-between" style="margin: 12px 0;">
+            {% if people_page.has_previous %}<a href="?q={{ query }}&people_page={{ people_page.previous_page_number }}" class="btn btn-secondary btn-sm">Previous</a>{% else %}<span></span>{% endif %}
+            {% if people_page.has_next %}<a href="?q={{ query }}&people_page={{ people_page.next_page_number }}" class="btn btn-secondary btn-sm">Next</a>{% endif %}
+          </div>
+        {% endif %}
+      </section>
+    {% endif %}
+
+    {% if hashtags_page.object_list %}
+      <section style="margin-bottom: var(--space-5);">
+        <h2 class="text-section-title" style="margin-bottom: var(--space-2);">Hashtags</h2>
+        <div class="flex gap-2" style="flex-wrap:wrap;">
+          {% for tag in hashtags_page %}
+            <a href="{% url 'posts:hashtag' name=tag.name %}" class="badge badge-accent">#{{ tag.name }}</a>
+          {% endfor %}
+        </div>
+        {% if hashtags_page.has_other_pages %}
+          <div class="flex justify-between" style="margin: 12px 0;">
+            {% if hashtags_page.has_previous %}<a href="?q={{ query }}&tags_page={{ hashtags_page.previous_page_number }}" class="btn btn-secondary btn-sm">Previous</a>{% else %}<span></span>{% endif %}
+            {% if hashtags_page.has_next %}<a href="?q={{ query }}&tags_page={{ hashtags_page.next_page_number }}" class="btn btn-secondary btn-sm">Next</a>{% endif %}
+          </div>
+        {% endif %}
+      </section>
+    {% endif %}
+
+    {% if posts_page.object_list %}
+      <section>
+        <h2 class="text-section-title" style="margin-bottom: var(--space-2);">Posts</h2>
+        <div class="post-grid">
+          {% for post in posts_page %}
+            <a href="{% url 'posts:detail' pk=post.pk %}" class="post-grid-item">
+              {% include "posts/_media_thumbnail.html" with post=post %}
+            </a>
+          {% endfor %}
+        </div>
+        {% if posts_page.has_other_pages %}
+          <div class="flex justify-between" style="margin: 12px 0;">
+            {% if posts_page.has_previous %}<a href="?q={{ query }}&posts_page={{ posts_page.previous_page_number }}" class="btn btn-secondary btn-sm">Previous</a>{% else %}<span></span>{% endif %}
+            {% if posts_page.has_next %}<a href="?q={{ query }}&posts_page={{ posts_page.next_page_number }}" class="btn btn-secondary btn-sm">Next</a>{% endif %}
+          </div>
+        {% endif %}
+      </section>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

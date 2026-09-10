@@ -1,0 +1,32 @@
+{% extends "app_base.html" %}
+{% block title %}Nexa — Home{% endblock %}
+{% block shell_content %}
+<header class="page-header">
+  <h1 class="text-page-title">Home</h1>
+</header>
+<div class="page-content">
+  {% if is_discovery_fallback %}
+    <div class="badge badge-accent" style="margin-bottom:16px;">Showing discovery posts — follow people to personalize your feed</div>
+  {% endif %}
+
+  {% if page_obj.object_list %}
+    {% for post in page_obj %}
+      {% include "posts/_post_card.html" with post=post show_comment_preview=True redirect_url="/home/" %}
+    {% endfor %}
+
+    {% if page_obj.has_other_pages %}
+      <div class="flex justify-between" style="margin: 24px 0;">
+        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm">Newer</a>{% else %}<span></span>{% endif %}
+        {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm">Older</a>{% endif %}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="state-block">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+      <p class="state-title">Your feed is quiet.</p>
+      <p class="text-meta">Follow people to start building your Nexa.</p>
+      <a href="{% url 'core:explore' %}" class="btn btn-primary" style="margin-top:12px;">Explore Nexa</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

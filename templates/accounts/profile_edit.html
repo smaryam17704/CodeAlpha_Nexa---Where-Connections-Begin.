@@ -1,0 +1,28 @@
+{% extends "app_base.html" %}
+{% block title %}Nexa — Edit profile{% endblock %}
+{% block shell_content %}
+<header class="page-header">
+  <h1 class="text-page-title">Edit profile</h1>
+</header>
+<div class="page-content" style="max-width:520px;">
+  <form method="post" enctype="multipart/form-data" class="card" style="padding: var(--space-5);" novalidate>
+    {% csrf_token %}
+    <div class="avatar-upload">
+      <div class="avatar">
+        {% if request.user.profile.avatar %}<img src="{{ request.user.profile.avatar.url }}" alt="">{% else %}{{ request.user.username|slice:":1"|upper }}{% endif %}
+      </div>
+      <div class="field" style="margin-bottom:0; flex:1;">
+        <label>Profile picture</label>
+        {{ form.avatar }}
+      </div>
+    </div>
+    {% include "partials/form_field.html" with field=form.display_name %}
+    {% include "partials/form_field.html" with field=form.username %}
+    {% include "partials/form_field.html" with field=form.bio %}
+    <div class="flex gap-3">
+      <a href="{% url 'accounts:profile' username=request.user.username %}" class="btn btn-secondary btn-block">Cancel</a>
+      <button type="submit" class="btn btn-primary btn-block">Save changes</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

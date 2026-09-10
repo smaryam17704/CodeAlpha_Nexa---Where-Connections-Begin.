@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Nexa — Set up your profile{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/components.css' %}">{% endblock %}
+{% block body %}
+<div class="onboarding-page">
+  <a href="{% url 'core:landing' %}" class="brand-mark"><img src="{% static 'img/nexa-logo.png' %}" alt="Nexa logo" style="height:34px;"></a>
+  <div class="onboarding-progress">
+    <div class="dot done"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+  <div class="card onboarding-card">
+    <h1 class="text-page-title" style="margin-bottom:6px;">Set up your profile</h1>
+    <p class="text-meta" style="margin-bottom:24px;">This is how people will find and recognize you on Nexa.</p>
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      <div class="avatar-upload">
+        <div class="avatar">
+          {% if request.user.profile.avatar %}<img src="{{ request.user.profile.avatar.url }}" alt="">{% else %}{{ request.user.username|slice:":1"|upper }}{% endif %}
+        </div>
+        <div class="field" style="margin-bottom:0; flex:1;">
+          <label>Profile picture</label>
+          {{ form.avatar }}
+        </div>
+      </div>
+      {% include "partials/form_field.html" with field=form.display_name %}
+      {% include "partials/form_field.html" with field=form.username %}
+      {% include "partials/form_field.html" with field=form.bio %}
+      <button type="submit" class="btn btn-primary btn-block">Continue</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

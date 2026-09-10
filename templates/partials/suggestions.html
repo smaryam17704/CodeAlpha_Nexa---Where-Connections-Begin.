@@ -1,0 +1,38 @@
+{% load nexa_extras %}
+<div class="card right-card">
+  <div class="right-card-title">Suggested for you</div>
+  {% suggested_users request.user as suggested %}
+  {% if suggested %}
+    {% for person in suggested %}
+      <div class="suggestion-row">
+        <a href="{% url 'accounts:profile' username=person.username %}" class="avatar">
+          {% if person.profile.avatar %}<img src="{{ person.profile.avatar.url }}" alt="">{% else %}{{ person.username|slice:":1"|upper }}{% endif %}
+        </a>
+        <div class="suggestion-meta">
+          <a href="{% url 'accounts:profile' username=person.username %}" class="name truncate">{{ person.profile.get_display_name }}</a>
+          <div class="handle truncate">@{{ person.username }}</div>
+        </div>
+        <button class="btn btn-secondary btn-sm js-follow-btn" data-username="{{ person.username }}">Follow</button>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-meta">No suggestions right now — check back soon.</p>
+  {% endif %}
+</div>
+
+<div class="card right-card">
+  <div class="right-card-title">Trending hashtags</div>
+  {% trending_hashtags as tags %}
+  {% if tags %}
+    {% for tag in tags %}
+      <a href="{% url 'posts:hashtag' name=tag.name %}" class="flex justify-between items-center" style="padding: 8px 0;">
+        <span class="text-body" style="font-weight:600; color: var(--accent-blue);">#{{ tag.name }}</span>
+        <span class="text-caption">{{ tag.post_total }} post{{ tag.post_total|pluralize }}</span>
+      </a>
+    {% endfor %}
+  {% else %}
+    <p class="text-meta">Hashtags will appear here as Nexa grows.</p>
+  {% endif %}
+</div>
+
+<p class="text-caption" style="padding: 0 var(--space-2);">Nexa · Connect Beyond.</p>

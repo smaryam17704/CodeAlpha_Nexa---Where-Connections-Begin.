@@ -1,0 +1,34 @@
+{% extends "app_base.html" %}
+{% block title %}Nexa — #{{ hashtag.name }}{% endblock %}
+{% block shell_content %}
+<header class="page-header">
+  <h1 class="text-page-title">#{{ hashtag.name }}</h1>
+  <p class="text-meta">{{ page_obj.paginator.count }} post{{ page_obj.paginator.count|pluralize }}</p>
+</header>
+<div class="page-content" style="max-width: 720px;">
+  {% if page_obj.object_list %}
+    <div class="post-grid">
+      {% for post in page_obj %}
+        <a href="{% url 'posts:detail' pk=post.pk %}" class="post-grid-item">
+          {% include "posts/_media_thumbnail.html" with post=post %}
+          <div class="overlay-stats">
+            <span>♥ {{ post.like_count }}</span>
+            <span>💬 {{ post.comment_count }}</span>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+    {% if page_obj.has_other_pages %}
+      <div class="flex justify-between" style="margin: 24px 0;">
+        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm">Previous</a>{% else %}<span></span>{% endif %}
+        {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm">Next</a>{% endif %}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="state-block">
+      <p class="state-title">No posts yet</p>
+      <p class="text-meta">Nothing has been tagged #{{ hashtag.name }} yet.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

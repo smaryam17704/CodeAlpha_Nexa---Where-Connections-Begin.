@@ -1,0 +1,11 @@
+{% if post.media_type == 'image' and post.image %}
+  <img src="{{ post.image.url }}" alt="" loading="lazy">
+{% elif post.media_type == 'video' and post.video %}
+  <div class="post-thumb-fallback" aria-label="Video post"><span>▶</span><small>VIDEO</small></div>
+{% elif post.media_type == 'audio' and post.audio %}
+  <div class="post-thumb-fallback" aria-label="Audio post"><span>♫</span><small>AUDIO</small></div>
+{% elif post.media_type == 'document' and post.document %}
+  <div class="post-thumb-fallback" aria-label="Document post"><span>▤</span><small>{{ post.media_extension }}</small></div>
+{% else %}
+  <div class="post-thumb-fallback" aria-label="Media unavailable"><span>—</span><small>MEDIA</small></div>
+{% endif %}

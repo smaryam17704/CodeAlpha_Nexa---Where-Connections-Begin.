@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Nexa — Pick your interests{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/components.css' %}">{% endblock %}
+{% block body %}
+<div class="onboarding-page">
+  <a href="{% url 'core:landing' %}" class="brand-mark"><img src="{% static 'img/nexa-logo.png' %}" alt="Nexa logo" style="height:34px;"></a>
+  <div class="onboarding-progress">
+    <div class="dot done"></div><div class="dot done"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+  <div class="card onboarding-card">
+    <h1 class="text-page-title" style="margin-bottom:6px;">What are you into?</h1>
+    <p class="text-meta" style="margin-bottom:24px;">Pick a few interests so Nexa can help you discover great content and people.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="interest-grid">
+        {% for interest in interests %}
+          <label class="interest-chip">
+            <input type="checkbox" name="interests" value="{{ interest.id }}">
+            <span>{{ interest.icon }} {{ interest.name }}</span>
+          </label>
+        {% endfor %}
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Continue</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+{% block body %}
+{% load static %}
+<div class="app-shell">
+  <aside class="shell-sidebar">
+    <a href="{% url 'core:home' %}" class="brand-mark">
+      <img src="{% static 'img/nexa-logo.png' %}" alt="Nexa logo">
+      <span>Nexa</span>
+    </a>
+
+    <nav class="nav-list">
+      <a href="{% url 'core:home' %}" class="nav-item {% if request.resolver_match.url_name == 'home' or request.resolver_match.url_name == 'feed' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+        <span class="nav-label">Home</span>
+      </a>
+      <a href="{% url 'core:explore' %}" class="nav-item {% if request.resolver_match.url_name == 'explore' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m14.5 9.5-1.7 5.2-5.2 1.7 1.7-5.2z"/></svg>
+        <span class="nav-label">Explore</span>
+      </a>
+      <a href="{% url 'core:search' %}" class="nav-item {% if request.resolver_match.url_name == 'search' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <span class="nav-label">Search</span>
+      </a>
+      <a href="{% url 'notifications:list' %}" class="nav-item {% if request.resolver_match.url_name == 'list' and request.resolver_match.app_name == 'notifications' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+        <span class="nav-label">Notifications</span>
+        {% if unread_notification_count > 0 %}<span class="nav-badge">{{ unread_notification_count }}</span>{% endif %}
+      </a>
+      <a href="{% url 'social:saved_posts' %}" class="nav-item {% if request.resolver_match.url_name == 'saved_posts' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v17l-6-4-6 4z"/></svg>
+        <span class="nav-label">Saved</span>
+      </a>
+      <a href="{% url 'accounts:profile' username=request.user.username %}" class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+        <span class="nav-label">Profile</span>
+      </a>
+      <a href="{% url 'posts:create' %}" class="nav-item {% if request.resolver_match.url_name == 'create' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>
+        <span class="nav-label">Create</span>
+      </a>
+      <a href="{% url 'core:activity' %}" class="nav-item {% if request.resolver_match.url_name == 'activity' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg>
+        <span class="nav-label">Activity</span>
+      </a>
+      <a href="{% url 'core:settings' %}" class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.6 1z"/></svg>
+        <span class="nav-label">Settings</span>
+      </a>
+    </nav>
+
+    <a href="{% url 'accounts:profile' username=request.user.username %}" class="sidebar-user">
+      <div class="avatar">
+        {% if request.user.profile.avatar %}<img src="{{ request.user.profile.avatar.url }}" alt="">{% else %}{{ request.user.username|slice:":1"|upper }}{% endif %}
+      </div>
+      <div class="user-meta">
+        <div class="text-body" style="font-weight:700;">{{ request.user.profile.get_display_name }}</div>
+        <div class="text-caption">@{{ request.user.username }}</div>
+      </div>
+    </a>
+  </aside>
+
+  <div class="mobile-topbar">
+    <img src="{% static 'img/nexa-logo.png' %}" alt="Nexa">
+    <div class="flex gap-3 items-center">
+      <a href="{% url 'core:search' %}" class="btn-icon" style="display:flex;align-items:center;justify-content:center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      </a>
+      <a href="{% url 'notifications:list' %}" class="btn-icon" style="display:flex;align-items:center;justify-content:center; position:relative;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+        {% if unread_notification_count > 0 %}<span class="nav-badge" style="position:absolute; top:-4px; right:-4px;">{{ unread_notification_count }}</span>{% endif %}
+      </a>
+    </div>
+  </div>
+
+  <main class="shell-main">
+    {% block shell_content %}{% endblock %}
+  </main>
+
+  <aside class="shell-right">
+    {% block right_rail %}
+      {% include "partials/suggestions.html" %}
+    {% endblock %}
+  </aside>
+</div>
+
+<nav class="mobile-bottom-nav">
+  <a href="{% url 'core:home' %}" class="{% if request.resolver_match.url_name == 'home' or request.resolver_match.url_name == 'feed' %}active{% endif %}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+    Home
+  </a>
+  <a href="{% url 'core:explore' %}" class="{% if request.resolver_match.url_name == 'explore' %}active{% endif %}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+    Explore
+  </a>
+  <a href="{% url 'posts:create' %}" class="{% if request.resolver_match.url_name == 'create' %}active{% endif %}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>
+    Create
+  </a>
+  <a href="{% url 'core:activity' %}" class="{% if request.resolver_match.url_name == 'activity' %}active{% endif %}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg>
+    Activity
+  </a>
+  <a href="{% url 'accounts:profile' username=request.user.username %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+    Profile
+  </a>
+</nav>
+
+{% endblock %}

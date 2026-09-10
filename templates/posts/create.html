@@ -1,0 +1,62 @@
+{% extends "app_base.html" %}
+{% load static %}
+{% block title %}Nexa — Create{% endblock %}
+{% block shell_content %}
+<header class="page-header">
+  <h1 class="text-page-title">Create a post</h1>
+</header>
+<div class="page-content" style="max-width:560px;">
+  <form method="post" enctype="multipart/form-data" class="card post-composer" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="field-error form-error-summary">{% for error in form.non_field_errors %}{{ error }}{% endfor %}</div>
+    {% endif %}
+
+    <div class="field">
+      <label>Media type</label>
+      <div class="media-type-selector" role="tablist" aria-label="Choose media type">
+        {% for value, label in form.media_type.field.choices %}
+          <label class="media-type-option {% if form.media_type.value == value or not form.media_type.value and value == 'image' %}active{% endif %}" data-media-type-option="{{ value }}">
+            <input type="radio" name="media_type" value="{{ value }}" {% if form.media_type.value == value or not form.media_type.value and value == 'image' %}checked{% endif %}>
+            <span>{{ label }}</span>
+          </label>
+        {% endfor %}
+      </div>
+      {% for error in form.media_type.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+    </div>
+
+    <div class="field">
+      <label for="id_image">File</label>
+      <div class="media-upload-zone js-media-upload-zone" tabindex="0">
+        <div class="js-media-preview media-preview" aria-live="polite"></div>
+        <div class="media-upload-placeholder js-media-placeholder">
+          <div class="upload-icon" aria-hidden="true">＋</div>
+          <strong class="js-media-prompt">Choose an image to share</strong>
+          <span class="field-hint js-media-hint">JPG, JPEG, PNG, WEBP, or GIF · up to 8MB</span>
+          <span class="field-hint">You can also drag and drop a file here.</span>
+        </div>
+        <div class="media-inputs">
+          <div class="js-media-input-wrap" data-media-input-wrap="image">{{ form.image }}</div>
+          <div class="js-media-input-wrap" data-media-input-wrap="video">{{ form.video }}</div>
+          <div class="js-media-input-wrap" data-media-input-wrap="audio">{{ form.audio }}</div>
+          <div class="js-media-input-wrap" data-media-input-wrap="document">{{ form.document }}</div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm js-media-browse">Choose file</button>
+        <button type="button" class="btn btn-ghost btn-sm js-media-remove" hidden>Remove selected file</button>
+        <div class="media-file-meta js-media-file-meta" hidden></div>
+      </div>
+      <div class="field-error js-media-client-error" role="alert"></div>
+      {% for error in form.image.errors %}<div class="field-error" data-media-error="image">{{ error }}</div>{% endfor %}
+      {% for error in form.video.errors %}<div class="field-error" data-media-error="video">{{ error }}</div>{% endfor %}
+      {% for error in form.audio.errors %}<div class="field-error" data-media-error="audio">{{ error }}</div>{% endfor %}
+      {% for error in form.document.errors %}<div class="field-error" data-media-error="document">{{ error }}</div>{% endfor %}
+    </div>
+
+    {% include "partials/form_field.html" with field=form.caption %}
+    <div class="flex gap-3" style="margin-top: var(--space-3);">
+      <a href="{% url 'core:home' %}" class="btn btn-secondary btn-block">Cancel</a>
+      <button type="submit" class="btn btn-primary btn-block">Publish</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

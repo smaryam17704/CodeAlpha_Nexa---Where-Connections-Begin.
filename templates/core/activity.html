@@ -1,0 +1,41 @@
+{% extends "app_base.html" %}
+{% block title %}Nexa — Activity{% endblock %}
+{% block shell_content %}
+<header class="page-header">
+  <h1 class="text-page-title">Your activity</h1>
+</header>
+<div class="page-content" style="max-width: 640px;">
+  {% if events %}
+    <div class="card" style="overflow:hidden;">
+      {% for event in events %}
+        <div class="notif-item">
+          {% if event.type == 'post' %}
+            <div class="notif-icon comment"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div>
+            <div style="flex:1;">You published a new post <span class="text-caption">· {{ event.timestamp|timesince }} ago</span></div>
+            <a href="{% url 'posts:detail' pk=event.post.pk %}" class="notif-thumb">
+              {% include "posts/_media_thumbnail.html" with post=event.post %}
+            </a>
+          {% elif event.type == 'comment' %}
+            <div class="notif-icon comment"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M21 11.5a8.4 8.4 0 0 1-8.8 8.4A9 9 0 0 1 8 19l-5 1 1.4-4.2A8.4 8.4 0 1 1 21 11.5z"/></svg></div>
+            <div style="flex:1;">You commented: "{{ event.comment.content|truncatechars:60 }}" <span class="text-caption">· {{ event.timestamp|timesince }} ago</span></div>
+          {% elif event.type == 'like' %}
+            <div class="notif-icon like"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.4 2 4.5 5.6 4.5c2 0 3.5 1.1 4.4 2.6.9-1.5 2.4-2.6 4.4-2.6 3.6 0 5.2 3.9 3.6 7.2C19.5 16.4 12 21 12 21z"/></svg></div>
+            <div style="flex:1;">You liked a post by @{{ event.post.author.username }} <span class="text-caption">· {{ event.timestamp|timesince }} ago</span></div>
+          {% elif event.type == 'follow' %}
+            <div class="notif-icon follow"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/></svg></div>
+            <div style="flex:1;">You followed @{{ event.target.username }} <span class="text-caption">· {{ event.timestamp|timesince }} ago</span></div>
+          {% elif event.type == 'save' %}
+            <div class="notif-icon follow"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M6 4h12v17l-6-4-6 4z"/></svg></div>
+            <div style="flex:1;">You saved a post by @{{ event.post.author.username }} <span class="text-caption">· {{ event.timestamp|timesince }} ago</span></div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="state-block">
+      <p class="state-title">No activity yet.</p>
+      <p class="text-meta">Everything you do on Nexa will show up here.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

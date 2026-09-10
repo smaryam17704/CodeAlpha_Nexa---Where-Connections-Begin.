@@ -1,0 +1,77 @@
+{% load nexa_extras %}
+<article class="card post-card">
+  <div class="post-header">
+    <a href="{% url 'accounts:profile' username=post.author.username %}" class="avatar">
+      {% if post.author.profile.avatar %}<img src="{{ post.author.profile.avatar.url }}" alt="">{% else %}{{ post.author.username|initial }}{% endif %}
+    </a>
+    <div class="post-header-meta">
+      <div class="name-row">
+        <a href="{% url 'accounts:profile' username=post.author.username %}" class="display-name truncate">{{ post.author.profile.get_display_name }}</a>
+        <span class="username truncate">@{{ post.author.username }}</span>
+      </div>
+      <div class="timestamp">{{ post.created_at|timesince }} ago</div>
+    </div>
+    {% if post.author == request.user %}
+      <div class="post-menu-wrap">
+        <button class="btn-icon js-menu-trigger" aria-label="Post options">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+        </button>
+        <div class="post-menu-dropdown">
+          <a href="{% url 'posts:edit' pk=post.pk %}">Edit post</a>
+          <button type="button" class="danger js-delete-post"
+                  data-delete-url="{% url 'posts:delete' pk=post.pk %}"
+                  data-redirect="{{ redirect_url|default:'/home/' }}">Delete post</button>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  {% if post.media_type == 'image' %}
+    <a href="{% url 'posts:detail' pk=post.pk %}" class="post-media-link">
+      {% include "posts/_media.html" with post=post %}
+    </a>
+  {% else %}
+    <div class="post-media-link">
+      {% include "posts/_media.html" with post=post %}
+    </div>
+  {% endif %}
+
+  <div class="post-actions">
+    <button class="btn-icon js-like-btn {% if post|is_liked_by:request.user %}liked{% endif %}" data-post-id="{{ post.pk }}" aria-label="Like">
+      <svg viewBox="0 0 24 24" fill="{% if post|is_liked_by:request.user %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.4 2 4.5 5.6 4.5c2 0 3.5 1.1 4.4 2.6.9-1.5 2.4-2.6 4.4-2.6 3.6 0 5.2 3.9 3.6 7.2C19.5 16.4 12 21 12 21z"/></svg>
+    </button>
+    <a href="{% url 'posts:detail' pk=post.pk %}#comments" class="btn-icon" aria-label="Comment">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.8 8.4A9 9 0 0 1 8 19l-5 1 1.4-4.2A8.4 8.4 0 1 1 21 11.5z"/></svg>
+    </a>
+    <button class="btn-icon js-save-btn {% if post|is_saved_by:request.user %}saved{% endif %}" data-post-id="{{ post.pk }}" aria-label="Save" style="margin-left:auto;">
+      <svg viewBox="0 0 24 24" fill="{% if post|is_saved_by:request.user %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2"><path d="M6 4h12v17l-6-4-6 4z"/></svg>
+    </button>
+  </div>
+
+  <div class="post-stats">
+    <span class="js-like-count-{{ post.pk }}">{{ post.like_count }}</span> like{{ post.like_count|pluralize }}
+    &middot;
+    <span class="js-comment-count-{{ post.pk }}">{{ post.comment_count }}</span> comment{{ post.comment_count|pluralize }}
+  </div>
+
+  {% if post.caption %}
+    <div class="post-caption"><span style="font-weight:700;">{{ post.author.username }}</span> {{ post.caption|linkify_hashtags }}</div>
+  {% endif %}
+
+  {% if show_comment_preview %}
+    <div class="comment-preview js-comment-list-{{ post.pk }}">
+      {% for comment in post.comments.all|slice:"-2:" %}
+        <div class="comment-row">
+          <div class="avatar">
+            {% if comment.author.profile.avatar %}<img src="{{ comment.author.profile.avatar.url }}" alt="">{% else %}{{ comment.author.username|initial }}{% endif %}
+          </div>
+          <div class="bubble"><span class="author">{{ comment.author.profile.get_display_name }}</span>{{ comment.content }}</div>
+        </div>
+      {% endfor %}
+    </div>
+    <form class="comment-form js-comment-form" data-post-id="{{ post.pk }}">
+      <input type="text" name="content" class="input" placeholder="Add a comment..." maxlength="500">
+      <button type="submit" class="btn btn-primary btn-sm">Post</button>
+    </form>
+  {% endif %}
+</article>

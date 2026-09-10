@@ -1,0 +1,66 @@
+{% extends "app_base.html" %}
+{% block title %}Nexa — Explore{% endblock %}
+{% block shell_content %}
+<header class="page-header">
+  <h1 class="text-page-title">Explore</h1>
+</header>
+<div class="page-content" style="max-width: 760px;">
+
+  {% if trending_hashtags %}
+    <section style="margin-bottom: var(--space-6);">
+      <h2 class="text-section-title" style="margin-bottom: var(--space-3);">Trending hashtags</h2>
+      <div class="flex gap-2" style="flex-wrap:wrap;">
+        {% for tag in trending_hashtags %}
+          <a href="{% url 'posts:hashtag' name=tag.name %}" class="badge badge-accent">#{{ tag.name }} · {{ tag.post_total }}</a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {% if suggested_creators %}
+    <section style="margin-bottom: var(--space-6);">
+      <h2 class="text-section-title" style="margin-bottom: var(--space-3);">Suggested creators</h2>
+      <div class="flex gap-3" style="overflow-x:auto;" class="scroll-hide">
+        {% for person in suggested_creators %}
+          <div class="card" style="min-width:160px; padding: var(--space-4); text-align:center; flex-shrink:0;">
+            <a href="{% url 'accounts:profile' username=person.username %}" class="avatar" style="width:56px; height:56px; margin: 0 auto 10px; font-size:18px;">
+              {% if person.profile.avatar %}<img src="{{ person.profile.avatar.url }}" alt="">{% else %}{{ person.username|slice:":1"|upper }}{% endif %}
+            </a>
+            <div style="font-weight:700; font-size:13px;" class="truncate">{{ person.profile.get_display_name }}</div>
+            <div class="text-caption truncate">@{{ person.username }}</div>
+            <button class="btn btn-secondary btn-sm js-follow-btn" data-username="{{ person.username }}" style="margin-top:10px; width:100%;">Follow</button>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <section>
+    <h2 class="text-section-title" style="margin-bottom: var(--space-3);">Popular posts</h2>
+    {% if page_obj.object_list %}
+      <div class="post-grid">
+        {% for post in page_obj %}
+          <a href="{% url 'posts:detail' pk=post.pk %}" class="post-grid-item">
+            {% include "posts/_media_thumbnail.html" with post=post %}
+            <div class="overlay-stats">
+              <span>♥ {{ post.like_count }}</span>
+              <span>💬 {{ post.comment_count }}</span>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+      {% if page_obj.has_other_pages %}
+        <div class="flex justify-between" style="margin: 24px 0;">
+          {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm">Previous</a>{% else %}<span></span>{% endif %}
+          {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm">Next</a>{% endif %}
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="state-block">
+        <p class="state-title">Nothing to discover yet</p>
+        <p class="text-meta">As more people post on Nexa, popular content will show up here.</p>
+      </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

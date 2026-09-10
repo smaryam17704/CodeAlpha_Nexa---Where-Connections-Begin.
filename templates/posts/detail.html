@@ -1,0 +1,83 @@
+{% extends "app_base.html" %}
+{% load nexa_extras %}
+{% block title %}Nexa — Post by {{ post.author.username }}{% endblock %}
+{% block shell_content %}
+<header class="page-header">
+  <h1 class="text-page-title">Post</h1>
+</header>
+<div class="page-content">
+  <article class="card post-card">
+    <div class="post-header">
+      <a href="{% url 'accounts:profile' username=post.author.username %}" class="avatar">
+        {% if post.author.profile.avatar %}<img src="{{ post.author.profile.avatar.url }}" alt="">{% else %}{{ post.author.username|initial }}{% endif %}
+      </a>
+      <div class="post-header-meta">
+        <div class="name-row">
+          <a href="{% url 'accounts:profile' username=post.author.username %}" class="display-name truncate">{{ post.author.profile.get_display_name }}</a>
+          <span class="username truncate">@{{ post.author.username }}</span>
+        </div>
+        <div class="timestamp">{{ post.created_at|date:"M j, Y" }} · {{ post.created_at|timesince }} ago</div>
+      </div>
+      {% if post.author == request.user %}
+        <div class="post-menu-wrap">
+          <button class="btn-icon js-menu-trigger" aria-label="Post options">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+          </button>
+          <div class="post-menu-dropdown">
+            <a href="{% url 'posts:edit' pk=post.pk %}">Edit post</a>
+            <button type="button" class="danger js-delete-post" data-delete-url="{% url 'posts:delete' pk=post.pk %}" data-redirect="/home/">Delete post</button>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    {% include "posts/_media.html" with post=post show_download=True %}
+
+    <div class="post-actions">
+      <button class="btn-icon js-like-btn {% if post|is_liked_by:request.user %}liked{% endif %}" data-post-id="{{ post.pk }}" aria-label="Like">
+        <svg viewBox="0 0 24 24" fill="{% if post|is_liked_by:request.user %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.4 2 4.5 5.6 4.5c2 0 3.5 1.1 4.4 2.6.9-1.5 2.4-2.6 4.4-2.6 3.6 0 5.2 3.9 3.6 7.2C19.5 16.4 12 21 12 21z"/></svg>
+      </button>
+      <button class="btn-icon js-save-btn {% if post|is_saved_by:request.user %}saved{% endif %}" data-post-id="{{ post.pk }}" aria-label="Save" style="margin-left:auto;">
+        <svg viewBox="0 0 24 24" fill="{% if post|is_saved_by:request.user %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2"><path d="M6 4h12v17l-6-4-6 4z"/></svg>
+      </button>
+    </div>
+    <div class="post-stats">
+      <span class="js-like-count-{{ post.pk }}">{{ post.like_count }}</span> like{{ post.like_count|pluralize }}
+      &middot;
+      <span class="js-comment-count-{{ post.pk }}">{{ post.comment_count }}</span> comment{{ post.comment_count|pluralize }}
+    </div>
+    {% if post.caption %}
+      <div class="post-caption"><span style="font-weight:700;">{{ post.author.username }}</span> {{ post.caption|linkify_hashtags }}</div>
+    {% endif %}
+
+    <div id="comments" class="comment-preview js-comment-list-{{ post.pk }}" style="padding-top: var(--space-3);">
+      {% for comment in comments %}
+        <div class="comment-row">
+          <a href="{% url 'accounts:profile' username=comment.author.username %}" class="avatar">
+            {% if comment.author.profile.avatar %}<img src="{{ comment.author.profile.avatar.url }}" alt="">{% else %}{{ comment.author.username|initial }}{% endif %}
+          </a>
+          <div class="bubble">
+            <span class="author">{{ comment.author.profile.get_display_name }}</span>{{ comment.content }}
+            {% if comment.author == request.user %}
+              <div><button type="button" class="delete-btn js-delete-comment" data-comment-id="{{ comment.pk }}" data-post-id="{{ post.pk }}">Delete</button></div>
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-meta">No comments yet — be the first to say something.</p>
+      {% endfor %}
+    </div>
+    {% if has_more_comments %}
+      <div style="padding: 0 var(--space-4) var(--space-3);">
+        <button type="button" class="btn btn-secondary btn-sm btn-block js-load-more-comments"
+                data-post-id="{{ post.pk }}" data-next-page="2">Load more comments</button>
+      </div>
+    {% endif %}
+    <form class="comment-form js-comment-form" data-post-id="{{ post.pk }}">
+      {% csrf_token %}
+      <input type="text" name="content" class="input" placeholder="Add a comment..." maxlength="500">
+      <button type="submit" class="btn btn-primary btn-sm">Post</button>
+    </form>
+  </article>
+</div>
+{% endblock %}

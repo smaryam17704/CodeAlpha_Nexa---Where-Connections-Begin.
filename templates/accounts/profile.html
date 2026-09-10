@@ -1,0 +1,72 @@
+{% extends "app_base.html" %}
+{% block title %}Nexa — @{{ profile_user.username }}{% endblock %}
+{% block shell_content %}
+<header class="page-header">
+  <h1 class="text-page-title">@{{ profile_user.username }}</h1>
+</header>
+<div class="page-content" style="max-width: 720px;">
+  <div class="profile-header">
+    <div class="avatar" style="width:112px; height:112px; font-size:34px;">
+      {% if profile.avatar %}<img src="{{ profile.avatar.url }}" alt="">{% else %}{{ profile_user.username|slice:":1"|upper }}{% endif %}
+    </div>
+    <div style="flex:1; min-width:220px;">
+      <div class="flex items-center gap-3" style="flex-wrap:wrap;">
+        <h2 class="text-page-title">{{ profile.get_display_name }}</h2>
+        {% if is_own_profile %}
+          <a href="{% url 'accounts:profile_edit' %}" class="btn btn-secondary btn-sm">Edit profile</a>
+          <a href="{% url 'core:settings' %}" class="btn-icon" aria-label="Settings">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.6 1z"/></svg>
+          </a>
+        {% else %}
+          <button class="btn {% if is_following or is_requested %}btn-secondary{% else %}btn-primary{% endif %} btn-sm js-follow-btn" data-username="{{ profile_user.username }}">
+            {% if is_following %}Following{% elif is_requested %}Requested{% else %}Follow{% endif %}
+          </button>
+        {% endif %}
+      </div>
+      <p class="text-meta">@{{ profile_user.username }} {% if profile.is_private %}<span class="badge" style="margin-left:6px;">🔒 Private</span>{% endif %}</p>
+      {% if not is_private_and_blocked %}
+        {% if profile.bio %}<p class="text-body" style="margin-top:8px;">{{ profile.bio }}</p>{% endif %}
+        <div class="profile-stats">
+          <div><span class="stat-value">{{ profile.post_count }}</span> <span class="stat-label">Posts</span></div>
+          <a href="{% url 'accounts:followers' username=profile_user.username %}"><span class="stat-value js-follower-count-{{ profile_user.username }}">{{ profile.follower_count }}</span> <span class="stat-label">Followers</span></a>
+          <a href="{% url 'accounts:following' username=profile_user.username %}"><span class="stat-value">{{ profile.following_count }}</span> <span class="stat-label">Following</span></a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if is_private_and_blocked %}
+    <div class="state-block">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <p class="state-title">This account is private</p>
+      <p class="text-meta">Follow @{{ profile_user.username }} to see their posts and activity.</p>
+    </div>
+  {% elif page_obj.object_list %}
+    <div class="post-grid">
+      {% for post in page_obj %}
+        <a href="{% url 'posts:detail' pk=post.pk %}" class="post-grid-item">
+          {% include "posts/_media_thumbnail.html" with post=post %}
+          <div class="overlay-stats">
+            <span>♥ {{ post.like_count }}</span>
+            <span>💬 {{ post.comment_count }}</span>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+    {% if page_obj.has_other_pages %}
+      <div class="flex justify-between" style="margin: 24px 0;">
+        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm">Previous</a>{% else %}<span></span>{% endif %}
+        {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm">Next</a>{% endif %}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="state-block">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>
+      <p class="state-title">No posts yet</p>
+      {% if is_own_profile %}
+        <a href="{% url 'posts:create' %}" class="btn btn-primary" style="margin-top:12px;">Create your first post</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

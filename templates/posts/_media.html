@@ -1,0 +1,32 @@
+{% if post.media_type == 'video' and post.video %}
+  <video class="post-media post-video" controls preload="metadata">
+    <source src="{{ post.video.url }}">
+    Your browser does not support video playback.
+  </video>
+{% elif post.media_type == 'audio' and post.audio %}
+  <div class="post-audio-wrap">
+    <div class="post-audio-label"><span class="media-type-icon">♫</span><span>{{ post.media_display_name }}</span></div>
+    <audio class="post-audio" controls preload="metadata">
+      <source src="{{ post.audio.url }}">
+      Your browser does not support audio playback.
+    </audio>
+  </div>
+{% elif post.media_type == 'document' and post.document %}
+  <div class="post-document-card">
+    <div class="document-icon" aria-hidden="true">▤</div>
+    <div class="document-details">
+      <strong class="document-name">{{ post.media_display_name }}</strong>
+      <span class="document-meta">{{ post.media_extension }}{% if post.media_size %} · {{ post.media_size|filesizeformat }}{% endif %}</span>
+    </div>
+    {% if show_download %}
+      <a href="{{ post.document.url }}" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">Open</a>
+      <a href="{{ post.document.url }}" class="btn btn-ghost btn-sm" download>Download</a>
+    {% else %}
+      <span class="document-action">Open post</span>
+    {% endif %}
+  </div>
+{% elif post.image %}
+  <img class="post-media" src="{{ post.image.url }}" alt="Post by {{ post.author.username }}" loading="lazy">
+{% else %}
+  <div class="post-media media-missing">Media unavailable</div>
+{% endif %}

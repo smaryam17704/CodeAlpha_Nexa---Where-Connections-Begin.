@@ -1,0 +1,22 @@
+{% extends "app_base.html" %}
+{% block title %}Nexa — Edit post{% endblock %}
+{% block shell_content %}
+<header class="page-header">
+  <h1 class="text-page-title">Edit post</h1>
+</header>
+<div class="page-content" style="max-width:520px;">
+  <div class="card" style="padding: var(--space-5);">
+    <div style="margin-bottom: var(--space-4);">
+      {% include "posts/_media.html" with post=post %}
+    </div>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% include "partials/form_field.html" with field=form.caption %}
+      <div class="flex gap-3">
+        <a href="{% url 'posts:detail' pk=post.pk %}" class="btn btn-secondary btn-block">Cancel</a>
+        <button type="submit" class="btn btn-primary btn-block">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

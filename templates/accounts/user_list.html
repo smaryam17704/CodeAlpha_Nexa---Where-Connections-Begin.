@@ -1,0 +1,44 @@
+{% extends "app_base.html" %}
+{% block title %}Nexa — {{ title }}{% endblock %}
+{% block shell_content %}
+<header class="page-header">
+  <h1 class="text-page-title">{{ title }}</h1>
+  <p class="text-meta">@{{ profile_user.username }}</p>
+</header>
+<div class="page-content" style="max-width:560px;">
+  {% if is_private_and_blocked %}
+    <div class="state-block">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <p class="state-title">This account is private</p>
+      <p class="text-meta">Follow @{{ profile_user.username }} to see this list.</p>
+    </div>
+  {% elif page_obj.object_list %}
+    {% for person in page_obj %}
+      <div class="user-row">
+        <a href="{% url 'accounts:profile' username=person.username %}" class="avatar">
+          {% if person.profile.avatar %}<img src="{{ person.profile.avatar.url }}" alt="">{% else %}{{ person.username|slice:":1"|upper }}{% endif %}
+        </a>
+        <a href="{% url 'accounts:profile' username=person.username %}" class="user-row-meta">
+          <div class="name truncate">{{ person.profile.get_display_name }}</div>
+          <div class="handle truncate">@{{ person.username }}</div>
+        </a>
+        {% if person != request.user %}
+          <button class="btn btn-sm js-follow-btn {% if person.id in my_following_ids or person.id in my_pending_ids %}btn-secondary{% else %}btn-primary{% endif %}" data-username="{{ person.username }}">
+            {% if person.id in my_following_ids %}Following{% elif person.id in my_pending_ids %}Requested{% else %}Follow{% endif %}
+          </button>
+        {% endif %}
+      </div>
+    {% endfor %}
+    {% if page_obj.has_other_pages %}
+      <div class="flex justify-between" style="margin: 24px 0;">
+        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary btn-sm">Previous</a>{% else %}<span></span>{% endif %}
+        {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary btn-sm">Next</a>{% endif %}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="state-block">
+      <p class="state-title">{% if title == "Followers" %}Your community is just getting started.{% else %}Not following anyone yet.{% endif %}</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
